@@ -131,6 +131,11 @@ contains
         INTEGER                   :: JDATE, JTIME
         INTEGER                   :: TSTEP( 3 )
       END SUBROUTINE VDIFF
+      SUBROUTINE CLDPROC ( CGRID, JDATE, JTIME, TSTEP )
+        REAL, POINTER             :: CGRID( :,:,:,: )
+        INTEGER                   :: JDATE, JTIME
+        INTEGER                   :: TSTEP( 3 )
+      END SUBROUTINE CLDPROC
       SUBROUTINE CHEM ( CGRID, JDATE, JTIME, TSTEP )
         REAL, POINTER             :: CGRID( :,:,:,: )
         INTEGER                   :: JDATE, JTIME
@@ -148,6 +153,9 @@ contains
 
     ! -- advance all physical and chemical processes on a grid
     CALL VDIFF ( CGRID, JDATE, JTIME, TSTEP )
+    
+    ! -- added by jphuang to call large-scale cloud washing out (9/2/2022)
+    CALL CLDPROC ( CGRID, JDATE, JTIME, TSTEP )
     
     CALL CHEM ( CGRID, JDATE, JTIME, TSTEP )
 
