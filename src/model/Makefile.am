@@ -52,7 +52,12 @@ libCCTM_a_SOURCES += \
 CLOUD = $(CCTM)/cloud/acm_ae6
 libCLOUD = $(CLOUD)/$(libCCTM)-
 libCCTM_a_SOURCES += \
-	$(CLOUD)/hlconst.F
+	$(CLOUD)/hlconst.F \
+	$(CLOUD)/scavwdep.F \
+	$(CLOUD)/getalpha.F \
+	$(CLOUD)/AQ_DATA.F \
+	$(CLOUD)/aqchem.F \
+	$(CLOUD)/indexn.f
 
 # depv
 DEPV = $(CCTM)/depv/m3dry
@@ -79,6 +84,7 @@ libCCTM_a_SOURCES += \
 	$(EMIS)/BEIS_DEFN.F \
 	$(EMIS)/BIOG_EMIS.F \
 	$(EMIS)/cropcal.F \
+	$(EMIS)/DUST_EMIS.F \
 	$(EMIS)/EMIS_DEFN.F \
 	$(EMIS)/LTNG_DEFN.F \
 	$(EMIS)/LUS_DEFN.F \
@@ -222,6 +228,7 @@ VDIFF = $(CCTM)/vdiff/acm2
 libVDIFF = $(VDIFF)/$(libCCTM)-
 libCCTM_a_SOURCES += \
 	$(VDIFF)/aero_sedv.F \
+	$(VDIFF)/ASX_DATA_MOD.F \
 	$(VDIFF)/conv_cgrid.F \
 	$(VDIFF)/matrix1.F \
 	$(VDIFF)/opddep.F \
@@ -240,10 +247,10 @@ libCCTM_a_SOURCES += \
 	$(localCCTM)/o3totcol.f \
 	$(localCCTM)/vdiffacmx.F \
 	$(localCCTM)/PTMAP.F \
-	$(localCCTM)/PT3D_DEFN.F \
-	$(localCCTM)/ASX_DATA_MOD.F \
-	$(localCCTM)/DUST_EMIS.F
-
+	$(localCCTM)/aq_map.F \
+	$(ocalCCTM)/cldproc_acm.F \
+ 	$(ocalCCTM)/rescld.F \
+	$(localCCTM)/PT3D_DEFN.F
 
 
 libCCTM_a_CPPFLAGS  = -DSUBST_FILES_ID=\"FILES_CTM.EXT\"
@@ -290,7 +297,7 @@ $(libAERO)AERO_DATA.$(OBJEXT) : $(ICL)/filenames/FILES_CTM.EXT \
 	$(libMECHS)RXNS_DATA_MODULE.$(OBJEXT) $(libUTIL)UTILIO_DEFN.$(OBJEXT)
 $(libAERO)aero_depv.$(OBJEXT) : $(ICL)/filenames/FILES_CTM.EXT \
 	$(libAERO)AERO_DATA.$(OBJEXT) $(libAERO)AEROMET_DATA.$(OBJEXT) \
-	$(liblocalCCTM)ASX_DATA_MOD.$(OBJEXT) $(libSPCS)CGRID_SPCS.$(OBJEXT) \
+	$(libVDIFF)ASX_DATA_MOD.$(OBJEXT) $(libSPCS)CGRID_SPCS.$(OBJEXT) \
 	$(libGRID)GRID_CONF.$(OBJEXT) $(libDEPV)LSM_MOD.$(OBJEXT) \
 	$(libDEPV)MOSAIC_MOD.$(OBJEXT) $(libMECHS)RXNS_DATA_MODULE.$(OBJEXT) \
 	$(libUTIL)UTILIO_DEFN.$(OBJEXT)
@@ -302,8 +309,8 @@ $(libAERO)aero_driver.$(OBJEXT) : $(ICL)/filenames/FILES_CTM.EXT \
 	$(libMECHS)RXNS_DATA_MODULE.$(OBJEXT) $(libAERO)SOA_DEFN.$(OBJEXT) \
 	$(libUTIL)UTILIO_DEFN.$(OBJEXT)
 $(libAERO)AERO_EMIS.$(OBJEXT) : $(ICL)/const/CONST.EXT $(ICL)/filenames/FILES_CTM.EXT \
-	$(libAERO)AERO_DATA.$(OBJEXT) $(liblocalCCTM)ASX_DATA_MOD.$(OBJEXT) \
-	$(libSPCS)CGRID_SPCS.$(OBJEXT) $(liblocalCCTM)DUST_EMIS.$(OBJEXT) \
+	$(libAERO)AERO_DATA.$(OBJEXT) $(libVDIFF)ASX_DATA_MOD.$(OBJEXT) \
+	$(libSPCS)CGRID_SPCS.$(OBJEXT) $(libEMIS)DUST_EMIS.$(OBJEXT) \
 	$(libGRID)GRID_CONF.$(OBJEXT) $(libAERO)PRECURSOR_DATA.$(OBJEXT) \
 	$(liblocalCCTM)PT3D_DEFN.$(OBJEXT) $(liblocalCCTM)PTMAP.$(OBJEXT) \
 	$(libMECHS)RXNS_DATA_MODULE.$(OBJEXT) $(libEMIS)SSEMIS.$(OBJEXT) \
@@ -319,7 +326,7 @@ $(libAERO)aero_subs.$(OBJEXT) : $(ICL)/const/CONST.EXT $(AERO)/isrpia.inc \
 	$(libAERO)AOD_DEFN.$(OBJEXT) $(libAERO)PRECURSOR_DATA.$(OBJEXT) \
 	$(libAERO)SOA_DEFN.$(OBJEXT) $(libUTIL)UTILIO_DEFN.$(OBJEXT)
 $(libAERO)AOD_DEFN.$(OBJEXT) : $(ICL)/filenames/FILES_CTM.EXT \
-	$(libAERO)AERO_DATA.$(OBJEXT) $(liblocalCCTM)ASX_DATA_MOD.$(OBJEXT) \
+	$(libAERO)AERO_DATA.$(OBJEXT) $(libVDIFF)ASX_DATA_MOD.$(OBJEXT) \
 	$(libSPCS)CGRID_SPCS.$(OBJEXT) $(libGRID)GRID_CONF.$(OBJEXT) \
 	$(libUTIL)UTILIO_DEFN.$(OBJEXT)
 $(libAERO)getpar.$(OBJEXT) : \
@@ -348,11 +355,11 @@ $(libAERO)SOA_DEFN.$(OBJEXT) : \
 
 # biog
 $(libBIOG)beis3.$(OBJEXT) : \
-	$(liblocalCCTM)ASX_DATA_MOD.$(OBJEXT) $(libEMIS)BIOG_EMIS.$(OBJEXT)
+	$(libVDIFF)ASX_DATA_MOD.$(OBJEXT) $(libEMIS)BIOG_EMIS.$(OBJEXT)
 $(libBIOG)czangle.$(OBJEXT) : $(ICL)/const/CONST.EXT \
-	$(liblocalCCTM)ASX_DATA_MOD.$(OBJEXT) $(libUTIL)UTILIO_DEFN.$(OBJEXT)
+	$(libVDIFF)ASX_DATA_MOD.$(OBJEXT) $(libUTIL)UTILIO_DEFN.$(OBJEXT)
 $(libBIOG)hrno.$(OBJEXT) : \
-	$(liblocalCCTM)ASX_DATA_MOD.$(OBJEXT) $(libEMIS)BIOG_EMIS.$(OBJEXT) \
+	$(libVDIFF)ASX_DATA_MOD.$(OBJEXT) $(libEMIS)BIOG_EMIS.$(OBJEXT) \
 	$(libGRID)HGRD_DEFN.$(OBJEXT) $(libDEPV)LSM_MOD.$(OBJEXT) \
 	$(libSTENEX)noop_modules.$(OBJEXT) $(libUTIL)UTILIO_DEFN.$(OBJEXT)
 $(libBIOG)parsline.$(OBJEXT) : \
@@ -366,10 +373,28 @@ $(libBIOG)wrdaymsg.$(OBJEXT) : \
 # cloud
 $(libCLOUD)hlconst.$(OBJEXT) : \
 	$(libUTIL)UTILIO_DEFN.$(OBJEXT)
+$(libCLOUD)scavwdep.$(OBJEXT) : $(ICL)/const/CONST.EXT \
+	$(libCLOUD)getalpha.$(OBJEXT) \
+	$(libCLOUD)indexn.$(OBJEXT) \
+	$(libCLOUD)hlconst.$(OBJEXT) \
+	$(libSPCS)CGRID_SPCS.$(OBJEXT) $(libUTIL)UTILIO_DEFN.$(OBJEXT)
+$(libCLOUD)getalpha.$(OBJEXT) : $(ICL)/const/CONST.EXT \
+        $(libAERO)AERO_DATA.$(OBJEXT)
+$(libCLOUD)aqchem.$(OBJEXT) : $(ICL)/const/CONST.EXT \
+	$(libCLOUD)AQ_DATA.$(OBJEXT) \
+	$(libCLOUD)hlconst.$(OBJEXT) \
+	$(libMECHS)RXNS_DATA_MODULE.$(OBJEXT) \
+	$(libAERO)AERO_DATA.$(OBJEXT) \
+	$(libUTIL)UTILIO_DEFN.$(OBJEXT)
+$(libCLOUD)AQ_DATA.$(OBJEXT) : $(ICL)/const/CONST.EXT \
+	$(libAERO)AERO_DATA.$(OBJEXT) \
+	$(libCLOUD)indexn.$(OBJEXT) \
+	$(libSPCS)CGRID_SPCS.$(OBJEXT) \
+	$(libUTIL)UTILIO_DEFN.$(OBJEXT) 
 
 # depv
 $(libDEPV)ABFLUX_MOD.$(OBJEXT) : $(ICL)/const/CONST.EXT $(ICL)/filenames/FILES_CTM.EXT \
-	$(liblocalCCTM)ASX_DATA_MOD.$(OBJEXT) $(libDEPV)BIDI_MOD.$(OBJEXT) \
+	$(libVDIFF)ASX_DATA_MOD.$(OBJEXT) $(libDEPV)BIDI_MOD.$(OBJEXT) \
 	$(libGRID)HGRD_DEFN.$(OBJEXT) $(libDEPV)LSM_MOD.$(OBJEXT) \
 	$(libDEPV)MOSAIC_MOD.$(OBJEXT) $(libUTIL)UTILIO_DEFN.$(OBJEXT)
 $(libDEPV)BIDI_MOD.$(OBJEXT) : $(ICL)/filenames/FILES_CTM.EXT \
@@ -379,7 +404,7 @@ $(libDEPV)cgrid_depv.$(OBJEXT) : \
 	$(libSPCS)CGRID_SPCS.$(OBJEXT) $(libGRID)HGRD_DEFN.$(OBJEXT) \
 	$(libUTIL)UTILIO_DEFN.$(OBJEXT)
 $(libDEPV)DEPV_DEFN.$(OBJEXT) : $(ICL)/const/CONST.EXT $(ICL)/filenames/FILES_CTM.EXT \
-	$(liblocalCCTM)ASX_DATA_MOD.$(OBJEXT) $(libDEPV)BIDI_MOD.$(OBJEXT) \
+	$(libVDIFF)ASX_DATA_MOD.$(OBJEXT) $(libDEPV)BIDI_MOD.$(OBJEXT) \
 	$(libSPCS)CGRID_SPCS.$(OBJEXT) $(libDEPV)DEPVVARS.$(OBJEXT) \
 	$(libGRID)HGRD_DEFN.$(OBJEXT) $(libDEPV)LSM_MOD.$(OBJEXT) \
 	$(libDEPV)MOSAIC_MOD.$(OBJEXT) $(libMECHS)RXNS_DATA_MODULE.$(OBJEXT) \
@@ -388,13 +413,13 @@ $(libDEPV)gas_depv_map.$(OBJEXT) : \
 	$(libSPCS)CGRID_SPCS.$(OBJEXT) $(libDEPV)DEPVVARS.$(OBJEXT) \
 	$(libUTIL)UTILIO_DEFN.$(OBJEXT)
 $(libDEPV)HGSIM.$(OBJEXT) : $(ICL)/const/CONST.EXT $(ICL)/filenames/FILES_CTM.EXT \
-	$(liblocalCCTM)ASX_DATA_MOD.$(OBJEXT) $(libDEPV)BIDI_MOD.$(OBJEXT) \
+	$(libVDIFF)ASX_DATA_MOD.$(OBJEXT) $(libDEPV)BIDI_MOD.$(OBJEXT) \
 	$(libDEPV)DEPVVARS.$(OBJEXT) $(libGRID)HGRD_DEFN.$(OBJEXT) \
 	$(libDEPV)LSM_MOD.$(OBJEXT) $(libUTIL)UTILIO_DEFN.$(OBJEXT)
 $(libDEPV)LSM_MOD.$(OBJEXT) : $(ICL)/filenames/FILES_CTM.EXT \
 	$(libGRID)HGRD_DEFN.$(OBJEXT) $(libUTIL)UTILIO_DEFN.$(OBJEXT)
 $(libDEPV)MOSAIC_MOD.$(OBJEXT) : $(ICL)/filenames/FILES_CTM.EXT \
-	$(liblocalCCTM)ASX_DATA_MOD.$(OBJEXT) $(libGRID)HGRD_DEFN.$(OBJEXT) \
+	$(libVDIFF)ASX_DATA_MOD.$(OBJEXT) $(libGRID)HGRD_DEFN.$(OBJEXT) \
 	$(libDEPV)LSM_MOD.$(OBJEXT) $(libUTIL)UTILIO_DEFN.$(OBJEXT)
 $(libDEPV)opdepv_diag.$(OBJEXT) : $(ICL)/filenames/FILES_CTM.EXT \
 	$(libDEPV)DEPVVARS.$(OBJEXT) $(libGRID)GRID_CONF.$(OBJEXT) \
@@ -406,7 +431,7 @@ $(libDEPV)opdepv_fst.$(OBJEXT) : $(ICL)/filenames/FILES_CTM.EXT \
 	$(libDEPV)DEPVVARS.$(OBJEXT) $(libGRID)GRID_CONF.$(OBJEXT) \
 	$(libDEPV)LSM_MOD.$(OBJEXT) $(libUTIL)UTILIO_DEFN.$(OBJEXT)
 $(libDEPV)m3dry.$(OBJEXT) : $(ICL)/filenames/FILES_CTM.EXT \
-	$(libDEPV)ABFLUX_MOD.$(OBJEXT) $(liblocalCCTM)ASX_DATA_MOD.$(OBJEXT) \
+	$(libDEPV)ABFLUX_MOD.$(OBJEXT) $(libVDIFF)ASX_DATA_MOD.$(OBJEXT) \
 	$(libDEPV)BIDI_MOD.$(OBJEXT) $(libDEPV)DEPVVARS.$(OBJEXT) \
 	$(libGRID)HGRD_DEFN.$(OBJEXT) $(libDEPV)HGSIM.$(OBJEXT) \
 	$(libDEPV)LSM_MOD.$(OBJEXT) $(libDEPV)MOSAIC_MOD.$(OBJEXT) \
@@ -421,9 +446,13 @@ $(libEMIS)BIOG_EMIS.$(OBJEXT) : \
 	$(libUTIL)UTILIO_DEFN.$(OBJEXT)
 $(libEMIS)cropcal.$(OBJEXT) : \
 	$(libGRID)HGRD_DEFN.$(OBJEXT) $(libUTIL)UTILIO_DEFN.$(OBJEXT)
+$(libEMIS)DUST_EMIS.$(OBJEXT) : $(ICL)/const/CONST.EXT $(ICL)/filenames/FILES_CTM.EXT \
+	$(libAERO)AERO_DATA.$(OBJEXT) $(libVDIFF)ASX_DATA_MOD.$(OBJEXT) \
+	$(libGRID)GRID_CONF.$(OBJEXT) $(libGRID)HGRD_DEFN.$(OBJEXT) \
+	$(libEMIS)LUS_DEFN.$(OBJEXT) $(libUTIL)UTILIO_DEFN.$(OBJEXT)
 $(libEMIS)EMIS_DEFN.$(OBJEXT) : $(ICL)/const/CONST.EXT $(ICL)/filenames/FILES_CTM.EXT \
 	$(libAERO)AERO_DATA.$(OBJEXT) $(libAERO)AERO_EMIS.$(OBJEXT) \
-	$(liblocalCCTM)ASX_DATA_MOD.$(OBJEXT) $(libEMIS)BEIS_DEFN.$(OBJEXT) \
+	$(libVDIFF)ASX_DATA_MOD.$(OBJEXT) $(libEMIS)BEIS_DEFN.$(OBJEXT) \
 	$(libEMIS)BIOG_EMIS.$(OBJEXT) $(libSPCS)CGRID_SPCS.$(OBJEXT) \
 	$(libDEPV)DEPV_DEFN.$(OBJEXT) $(libGRID)GRID_CONF.$(OBJEXT) \
 	$(libEMIS)LTNG_DEFN.$(OBJEXT) $(libEMIS)MGEMIS.$(OBJEXT) \
@@ -436,7 +465,7 @@ $(libEMIS)LTNG_DEFN.$(OBJEXT) : $(ICL)/filenames/FILES_CTM.EXT \
 $(libEMIS)LUS_DEFN.$(OBJEXT) : $(ICL)/filenames/FILES_CTM.EXT \
 	$(libGRID)HGRD_DEFN.$(OBJEXT) $(libUTIL)UTILIO_DEFN.$(OBJEXT)
 $(libEMIS)MGEMIS.$(OBJEXT) : $(ICL)/const/CONST.EXT $(ICL)/filenames/FILES_CTM.EXT \
-	$(libAERO)AEROMET_DATA.$(OBJEXT) $(liblocalCCTM)ASX_DATA_MOD.$(OBJEXT) \
+	$(libAERO)AEROMET_DATA.$(OBJEXT) $(libVDIFF)ASX_DATA_MOD.$(OBJEXT) \
 	$(libSPCS)CGRID_SPCS.$(OBJEXT) $(libGRID)GRID_CONF.$(OBJEXT) \
 	$(libGRID)HGRD_DEFN.$(OBJEXT) $(libGRID)PCGRID_DEFN.$(OBJEXT) \
 	$(libMECHS)RXNS_DATA_MODULE.$(OBJEXT) $(libUTIL)UTILIO_DEFN.$(OBJEXT)
@@ -449,7 +478,7 @@ $(libEMIS)PTBILIN.$(OBJEXT) : \
 	$(libEMIS)UDTYPES.$(OBJEXT) $(libGRID)VGRD_DEFN.$(OBJEXT)
 $(libEMIS)SSEMIS.$(OBJEXT) : $(ICL)/filenames/FILES_CTM.EXT \
 	$(libAERO)AERO_DATA.$(OBJEXT) $(libAERO)AEROMET_DATA.$(OBJEXT) \
-	$(liblocalCCTM)ASX_DATA_MOD.$(OBJEXT) $(libGRID)GRID_CONF.$(OBJEXT) \
+	$(libVDIFF)ASX_DATA_MOD.$(OBJEXT) $(libGRID)GRID_CONF.$(OBJEXT) \
 	$(libGRID)HGRD_DEFN.$(OBJEXT) $(libSTENEX)noop_modules.$(OBJEXT) \
 	$(libUTIL)UTILIO_DEFN.$(OBJEXT)
 $(libEMIS)STK_EMIS.$(OBJEXT) : \
@@ -458,7 +487,7 @@ $(libEMIS)STK_PRMS.$(OBJEXT) : \
 	$(libGRID)HGRD_DEFN.$(OBJEXT) $(libEMIS)UDTYPES.$(OBJEXT) \
 	$(libUTIL)UTILIO_DEFN.$(OBJEXT)
 $(libEMIS)tfabove.$(OBJEXT) : \
-	$(liblocalCCTM)ASX_DATA_MOD.$(OBJEXT) $(libGRID)HGRD_DEFN.$(OBJEXT) \
+	$(libVDIFF)ASX_DATA_MOD.$(OBJEXT) $(libGRID)HGRD_DEFN.$(OBJEXT) \
 	$(libEMIS)LUS_DEFN.$(OBJEXT)
 $(libEMIS)tfbelow.$(OBJEXT) : \
 	$(libGRID)HGRD_DEFN.$(OBJEXT) $(libEMIS)LUS_DEFN.$(OBJEXT) \
@@ -617,8 +646,12 @@ $(libUTIL)subhdomain.$(OBJEXT) : \
 # vdiff
 $(libVDIFF)aero_sedv.$(OBJEXT) : \
 	$(libAERO)AERO_DATA.$(OBJEXT) $(libAERO)AEROMET_DATA.$(OBJEXT) \
-	$(liblocalCCTM)ASX_DATA_MOD.$(OBJEXT) $(libSPCS)CGRID_SPCS.$(OBJEXT) \
+	$(libVDIFF)ASX_DATA_MOD.$(OBJEXT) $(libSPCS)CGRID_SPCS.$(OBJEXT) \
 	$(libGRID)GRID_CONF.$(OBJEXT) $(libUTIL)UTILIO_DEFN.$(OBJEXT)
+$(libVDIFF)ASX_DATA_MOD.$(OBJEXT) : $(ICL)/const/CONST.EXT $(ICL)/filenames/FILES_CTM.EXT $(ICL)/mpi/PE_COMM.EXT \
+	$(libDEPV)DEPVVARS.$(OBJEXT) $(libGRID)GRID_CONF.$(OBJEXT) \
+	$(libDEPV)LSM_MOD.$(OBJEXT) $(libSTENEX)noop_modules.$(OBJEXT) \
+	$(libUTIL)UTILIO_DEFN.$(OBJEXT)
 $(libVDIFF)conv_cgrid.$(OBJEXT) : $(ICL)/const/CONST.EXT $(ICL)/filenames/FILES_CTM.EXT \
 	$(libSPCS)CGRID_SPCS.$(OBJEXT) $(libGRID)GRID_CONF.$(OBJEXT) \
 	$(libUTIL)UTILIO_DEFN.$(OBJEXT)
@@ -638,7 +671,7 @@ $(libVDIFF)rddepv.$(OBJEXT) : $(ICL)/filenames/FILES_CTM.EXT \
 	$(libSPCS)CGRID_SPCS.$(OBJEXT) $(libGRID)HGRD_DEFN.$(OBJEXT) \
 	$(libMECHS)RXNS_DATA_MODULE.$(OBJEXT) $(libUTIL)UTILIO_DEFN.$(OBJEXT)
 $(libVDIFF)SEDIMENTATION.$(OBJEXT) : $(ICL)/const/CONST.EXT $(ICL)/filenames/FILES_CTM.EXT \
-	$(liblocalCCTM)ASX_DATA_MOD.$(OBJEXT) $(libSPCS)CGRID_SPCS.$(OBJEXT) \
+	$(libVDIFF)ASX_DATA_MOD.$(OBJEXT) $(libSPCS)CGRID_SPCS.$(OBJEXT) \
 	$(libGRID)GRID_CONF.$(OBJEXT) $(libUTIL)UTILIO_DEFN.$(OBJEXT) \
 	$(libVDIFF)VDIFF_DIAG.$(OBJEXT) $(libVDIFF)VDIFF_MAP.$(OBJEXT)
 $(libVDIFF)tri.$(OBJEXT) : \
@@ -650,7 +683,7 @@ $(libVDIFF)VDIFF_MAP.$(OBJEXT) : $(ICL)/emctrl/EMISPRM.EXT \
 	$(libAERO)AERO_EMIS.$(OBJEXT) $(libSPCS)CGRID_SPCS.$(OBJEXT) \
 	$(libUTIL)UTILIO_DEFN.$(OBJEXT)
 $(libVDIFF)vdiffproc.$(OBJEXT) : $(ICL)/filenames/FILES_CTM.EXT \
-	$(liblocalCCTM)ASX_DATA_MOD.$(OBJEXT) $(libDEPV)BIDI_MOD.$(OBJEXT) \
+	$(libVDIFF)ASX_DATA_MOD.$(OBJEXT) $(libDEPV)BIDI_MOD.$(OBJEXT) \
 	$(libSPCS)CGRID_SPCS.$(OBJEXT) $(libDEPV)DEPV_DEFN.$(OBJEXT) \
 	$(libEMIS)EMIS_DEFN.$(OBJEXT) $(libGRID)GRID_CONF.$(OBJEXT) \
 	$(libDEPV)HGSIM.$(OBJEXT) $(libDEPV)LSM_MOD.$(OBJEXT) \
@@ -662,7 +695,7 @@ $(libVDIFF)vdiffproc.$(OBJEXT) : $(ICL)/filenames/FILES_CTM.EXT \
 $(liblocalCCTM)o3totcol.$(OBJEXT) : \
 	$(libUTIL)UTILIO_DEFN.$(OBJEXT)
 $(liblocalCCTM)vdiffacmx.$(OBJEXT) : $(ICL)/filenames/FILES_CTM.EXT \
-	$(liblocalCCTM)ASX_DATA_MOD.$(OBJEXT) $(libDEPV)BIDI_MOD.$(OBJEXT) $(libSPCS)CGRID_SPCS.$(OBJEXT) \
+	$(libVDIFF)ASX_DATA_MOD.$(OBJEXT) $(libDEPV)BIDI_MOD.$(OBJEXT) $(libSPCS)CGRID_SPCS.$(OBJEXT) \
 	$(libSPCS)CGRID_SPCS.$(OBJEXT) $(libDEPV)DEPV_DEFN.$(OBJEXT) $(libEMIS)EMIS_DEFN.$(OBJEXT) \
 	$(libGRID)GRID_CONF.$(OBJEXT) $(libUTIL)UTILIO_DEFN.$(OBJEXT) \
 	$(libVDIFF)VDIFF_MAP.$(OBJEXT)
@@ -672,11 +705,19 @@ $(liblocalCCTM)PT3D_DEFN.$(OBJEXT) : $(libAERO)AERO_DATA.$(OBJEXT) \
 	$(libGRID)GRID_CONF.$(OBJEXT) $(libSPCS)CGRID_SPCS.$(OBJEXT) \
 	$(liblocalCCTM)PTMAP.$(OBJEXT) $(libMECHS)RXNS_DATA_MODULE.$(OBJEXT) \
 	$(libEMIS)STK_EMIS.$(OBJEXT) $(libUTIL)UTILIO_DEFN.$(OBJEXT)
-$(liblocalCCTM)ASX_DATA_MOD.$(OBJEXT) : $(ICL)/const/CONST.EXT $(ICL)/filenames/FILES_CTM.EXT $(ICL)/mpi/PE_COMM.EXT \
-        $(libDEPV)DEPVVARS.$(OBJEXT) $(libGRID)GRID_CONF.$(OBJEXT) \
-        $(libDEPV)LSM_MOD.$(OBJEXT) $(libSTENEX)noop_modules.$(OBJEXT) \
-        $(libUTIL)UTILIO_DEFN.$(OBJEXT)
-$(liblocalCCTM)DUST_EMIS.$(OBJEXT) : $(ICL)/const/CONST.EXT $(ICL)/filenames/FILES_CTM.EXT \
-       $(libAERO)AERO_DATA.$(OBJEXT) $(liblocalCCTM)ASX_DATA_MOD.$(OBJEXT) \
-       $(libGRID)GRID_CONF.$(OBJEXT) $(libGRID)HGRD_DEFN.$(OBJEXT) \
-       $(libEMIS)LUS_DEFN.$(OBJEXT) $(libUTIL)UTILIO_DEFN.$(OBJEXT)
+$(liblocalCCTM)cldproc_acm.$(OBJEXT) : $(ICL)/const/CONST.EXT \
+        $(ICL)/filenames/FILES_CTM.EXT $(liblocalCCTM)rescld.$(OBJEXT) \
+	$(libSPCS)CGRID_SPCS.$(OBJEXT) $(libGRID)GRID_CONF.$(OBJEXT) \
+	$(libUTIL)UTILIO_DEFN.$(OBJEXT)
+$(liblocalCCTM)rescld.$(OBJEXT) : $(ICL)/const/CONST.EXT \
+	$(ICL)/filenames/FILES_CTM.EXT  $(libCLOUD)scavwdep.$(OBJEXT) \
+	$(liblocalCCTM)aq_map.$(OBJEXT) $(BIOG)/czangle.F \
+	$(libSPCS)CGRID_SPCS.$(OBJEXT) $(libGRID)GRID_CONF.$(OBJEXT) \
+	$(libUTIL)UTILIO_DEFN.$(OBJEXT)
+$(liblocalCCTM)aq_map.$(OBJEXT) : $(ICL)/const/CONST.EXT \
+	$(libCLOUD)aqchem.$(OBJEXT) \
+	$(libCLOUD)indexn.$(OBJEXT) \
+	$(libAERO)AERO_DATA.$(OBJEXT) \
+	$(libSPCS)CGRID_SPCS.$(OBJEXT) \
+	$(libCLOUD)AQ_DATA.$(OBJEXT) \
+	$(libUTIL)UTILIO_DEFN.$(OBJEXT)
