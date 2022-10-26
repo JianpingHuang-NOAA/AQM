@@ -135,7 +135,6 @@ list(APPEND aqm_CCTM_files
 	${EMIS}/BEIS_DEFN.F
 	${EMIS}/BIOG_EMIS.F
 	${EMIS}/cropcal.F
-	${EMIS}/DUST_EMIS.F
 	${EMIS}/EMIS_DEFN.F
 	${EMIS}/LTNG_DEFN.F
 	${EMIS}/LUS_DEFN.F
@@ -220,7 +219,6 @@ list(APPEND aqm_CCTM_files
 	${UTIL}/subhdomain.F
 	${UTIL}/UTILIO_DEFN.F
 	${VDIFF}/aero_sedv.F
-	${VDIFF}/ASX_DATA_MOD.F
 	${VDIFF}/conv_cgrid.F
 	${VDIFF}/matrix1.F
 	${VDIFF}/opddep.F
@@ -236,6 +234,8 @@ list(APPEND aqm_CCTM_files
 	${localCCTM}/vdiffacmx.F
 	${localCCTM}/PTMAP.F
 	${localCCTM}/PT3D_DEFN.F
+	${localCCTM}/DUST_EMIS.F
+	${localCCTM}/ASX_DATA_MOD.F
 	${localCCTM}/cldproc_acm.F
 	${localCCTM}/rescld.F
 	${localCCTM}/aq_map.F
