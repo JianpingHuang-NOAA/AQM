@@ -270,7 +270,7 @@ C...  the met timestep in hours
         STIME = STIME3D
         MSTEP = TSTEP3D
 
-        MSTEP = 300
+        MSTEP = 0300
 
         METSTEP = FLOAT( TIME2SEC( MSTEP ) ) / 3600.0
 
