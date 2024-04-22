@@ -162,7 +162,7 @@ LOGICAL FUNCTION DESC3( FNAME )
 
   ELSE IF ( TRIM( FNAME ) .EQ. TRIM( MET_CRO_2D ) ) THEN
 
-    NVARS3D = 35
+    NVARS3D = 44
     VNAME3D( 1:NVARS3D ) = &
     (/ 'PRSFC           ', 'USTAR           ',            &
        'WSTAR           ', 'PBL             ',            &
@@ -180,6 +180,11 @@ LOGICAL FUNCTION DESC3( FNAME )
        'SEAICE          ', 'SOIM1           ',            &
        'SOIM2           ', 'SOIT1           ',            &
        'SOIT2           ', 'LH              ',            &
+       'FCH             ', 'FRT             ',            &
+       'CLU             ', 'POPU            ',            &
+       'LAIE            ', 'C1R             ',            &
+       'C2R             ', 'C3R             ',            &
+       'C4R             ',                                &
        'CLAYF           ', 'SANDF           ',            &
        'DRAG            ', 'UTHR            ' /)
     UNITS3D( 1:NVARS3D ) = &
@@ -199,6 +204,11 @@ LOGICAL FUNCTION DESC3( FNAME )
        'FRACTION        ', 'M**3/M**3       ',            &
        'M**3/M**3       ', 'K               ',            &
        'K               ', 'WATTS/M**2      ',            &
+       'M               ', 'NO UNIT         ',            &
+       'NO UNIT         ', 'PEOPLE/KM**2    ',            &
+       'NO UNIT         ', 'NO UNIT         ',            &
+       'NO UNIT         ', 'NO UNIT         ',            &
+       'NO UNIT         ',                                &
        '1               ', '1               ',            &
        '1               ', 'M/S             ' /)
 
@@ -369,6 +379,8 @@ logical function envyn(name, description, defaultval, status)
               aqm_emis_ispresent("point-source")
     case ('CTM_GRAV_SETL')
       envyn = .false.
+    case ('CTM_CANOPY_SHADE')
+      envyn = config % canopy_yn
     case ('CTM_WBDUST_FENGSHA')
       envyn = aqm_emis_ispresent("fengsha")
     case ('CTM_WB_DUST')
@@ -804,11 +816,21 @@ logical function interpx( fname, vname, pname, &
          end do
         end do
       case ("CLAYF","DRAG","SANDF","UTHR")
-        ! -- read in fengsha variables
+        ! -- fengsha variables
         call aqm_emis_read("fengsha", vname, buffer, rc=localrc)
         if (aqm_rc_test((localrc /= 0), &
           msg="Failure to read fengsha input for " // vname, &
           file=__FILE__, line=__LINE__)) return
+      case ("FCH","FRT","CLU","POPU","LAIE","C1R","C2R","C3R","C4R")
+        ! -- canopy variables
+        if (config % canopy_yn) then
+          call aqm_emis_read("canopy", vname, buffer, rc=localrc)
+          if (aqm_rc_test((localrc /= 0), &
+            msg="Failure to read canopy input for " // vname, &
+            file=__FILE__, line=__LINE__)) return
+        else
+          buffer(1:lbuf) = 0.
+        end if
       case default
     !   return
     end select
