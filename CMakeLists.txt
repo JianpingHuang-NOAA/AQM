@@ -20,7 +20,7 @@ if(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
   set(CMAKE_Fortran_FLAGS "-ffree-line-length-none -ffixed-line-length-none")
 elseif(CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
   set(CMAKE_Fortran_FLAGS "-extend-source 132")
-  set(CMAKE_Fortran_FLAGS_DEBUG "-O0 -g -check all -check noarg_temp_created -fpe0 -fno-alias -ftrapuv -traceback")
+  set(CMAKE_Fortran_FLAGS_DEBUG "-O0 -g -check bounds -check uninit -fpe0 -fno-alias -ftrapuv -traceback")
 else()
   message(WARNING "Fortran compiler with ID ${CMAKE_Fortran_COMPILER_ID} will be used with CMake default options")
 endif()
@@ -84,7 +84,6 @@ target_include_directories(CCTM PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY
                                         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/model/CMAQ/CCTM/src/ICL/fixed/const>
                                         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/model/CMAQ/CCTM/src/ICL/fixed/emctrl>
                                         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/model/CMAQ/CCTM/src/ICL/fixed/mpi>
-					$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/model/CMAQ/CCTM/src/aero/aero6>
 					$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/src/shr>
                                         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/src/io/ioapi>
                                         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/src/io/aqmio>)
