@@ -139,7 +139,6 @@ list(APPEND aqm_CCTM_files
 	${EMIS}/BEIS_DEFN.F
 	${EMIS}/BIOG_EMIS.F
 	${EMIS}/cropcal.F
-	${EMIS}/EMIS_DEFN.F
 	${EMIS}/LTNG_DEFN.F
 	${EMIS}/LUS_DEFN.F
 	${EMIS}/MGEMIS.F
@@ -244,4 +243,5 @@ list(APPEND aqm_CCTM_files
 	${localCCTM}/AERO_PHOTDATA.F
 	${localCCTM}/phot.F
 	${localCCTM}/centralized_io_util_module.F
+	${localCCTM}/EMIS_DEFN.F
 )
